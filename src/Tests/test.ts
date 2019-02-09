@@ -44,7 +44,15 @@ describe('Participant Removal', () => {
     newEvent.addRunner(genRunner);
     newEvent.addAdmin(genAdmin);
     it('can remove admin', () => {
-        expect(newEvent.removeAdmin(secondAdmin)).to.equal(secondAdmin)
+        let res = newEvent.removeAdmin(secondAdmin);
+        expect(res).to.not.be.null;
+        if(res == null) {
+            expect(1).to.equal(2);
+        }
+        else {
+            expect(res[0]).to.equal(secondAdmin)
+        }
+        
     })
     it('can ignore an irrelevant admin', () => {
         newEvent.addAdmin(secondAdmin);
@@ -53,8 +61,14 @@ describe('Participant Removal', () => {
         expect(newEvent.adminList().length).to.equal(2);
     })
     it('can remove a supervisor', () => {
-        let result = newEvent.removeSupervisor(genSupervisor);
-        expect(result).to.equal(genSupervisor);
+        let res = newEvent.removeSupervisor(genSupervisor);
+        expect(res).to.not.be.null;
+        if(res == null) {
+            expect(1).to.equal(2);
+        }
+        else {
+            expect(res[0]).to.equal(genSupervisor)
+        }
         expect(newEvent.supervisorList().length).to.equal(0);
     })
     it('can ignore unrelated supervisors', () => {

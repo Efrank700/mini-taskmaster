@@ -4,14 +4,30 @@ import {participantTypes} from "./Participant";
 export class ActionHandler {
     
     private event: TaskMastrEvent;
-   
+    private key1: number;
+    private key2: number;
+    private key3: number;
     constructor() {
         let keys = TaskMastrEvent.generateKeys();
-        this.event = new TaskMastrEvent("SOUP 2019", keys[0], keys[2], keys[2], "admin", []);
+        this.event = new TaskMastrEvent("SOUP 2019", keys[0], keys[1], keys[2], "admin", []);
+        this.key1 = keys[0];
+        this.key2 = keys[1];
+        this.key3 = keys[2];
     }
 
+    get adminKey() : number {
+        return this.key1;
+    }
 
-    public addUserToEvent(user: string, screen: string, socket: number,  
+    get superKey() : number {
+        return this.key2;
+    }
+
+    get runnerKey() : number {
+        return this.key3;
+    }
+
+    public addUserToEvent(screen: string, socket: number,  
         eventKey: number, location?: string): [boolean, participantTypes] {
         if(eventKey === this.event.$adminKey) {
             let adminLocation = location === undefined ? null : location;
@@ -39,7 +55,7 @@ export class ActionHandler {
                                         task: null,
                                         socketId: socket};
             let success = this.event.addRunner(runnerToAdd);
-            return([true, participantTypes.runner]);
+            return([success.task != null, participantTypes.runner]);
         }
     }
 
@@ -63,7 +79,7 @@ export class ActionHandler {
     //         else return([deleteResolution, retAdmin, retRunner]);
     // }
 
-    public addMaterials(eventKey: number, materialName: string, quantity: number) : boolean {
+    public addMaterials(materialName: string, quantity: number) : boolean {
         if(quantity <= 0) return false;
         else {
             let addition = this.event.addFreeMaterials(materialName, quantity);
@@ -71,7 +87,7 @@ export class ActionHandler {
         }
     }
 
-    public removeMaterials(eventKey: number, materialName: string, quantity: number): boolean | null {
+    public removeMaterials(materialName: string, quantity: number): boolean | null {
             if(quantity <= 0) return null;
             else{
                     let addition = this.event.removeFreeMaterials(materialName, quantity);
@@ -152,7 +168,7 @@ export class ActionHandler {
         }
     }
 
-    public getMaterials(eventName: string): [{itemName: string, count: number, user: 
+    public getMaterials(): [{itemName: string, count: number, user: 
     admin | supervisor}[], {itemName: string, count: number}[]] | null {
         let retFreeMaterials = this.event.getMaterialList();
         let retUsedMaterials = this.event.getUsedMaterialList();
@@ -178,7 +194,7 @@ export class ActionHandler {
         return this.event.taskList();
     }
 
-    public addTask(eventName: string, requesterScreenName: string, userRequest: boolean, 
+    public addTask(eventName: string, socketId: number, userRequest: boolean, 
     materialName?: string, quantity?: number):
     [boolean, task | null, runner | null] | null {
         if(!userRequest && (materialName === undefined || quantity === undefined)) return null;
@@ -186,22 +202,79 @@ export class ActionHandler {
         else if(materialName === undefined && quantity !== undefined) return null;
         else if(materialName !== undefined && quantity !== undefined) {
             if(userRequest) {
-                return this.event.addTask({});
+                let possible = this.event.requestValid(materialName, quantity);
+                if(!possible) return([false, null, null]);
+                let requester = this.event.getAdminBySocket(socketId);
+                if(requester === null) requester = this.event.getSupervisorBySocket(socketId);
+                if(requester === null) return null;
+                let checkoutRes = this.event.checkoutMaterials(materialName, quantity, requester);
+                if(!checkoutRes[0]) return([false, null, null]);
+                let depLocation : string = requester.location != null ? requester.location : 
+                `UNKNOWN: LOCATION OF ${requester.screenName} -- CONTACT ADMINISTRATOR`;
+                let reqTask : task = {supervisor: requester, runnerRequest: true, recieveLocation: "HOME BASE", depositLocation: depLocation,
+                                     item: materialName, quantity: quantity};
+                let res = this.event.addTask(reqTask);
+                return([res[0], res[1], res[2]]);
             }
             else {
-                return this.event.requestMaterial(eventName, requesterScreenName, materialName, quantity);
+                let possible = this.event.requestValid(materialName, quantity);
+                if(!possible) return([false, null, null]);
+                let requester = this.event.getAdminBySocket(socketId);
+                if(requester === null) requester = this.event.getSupervisorBySocket(socketId);
+                if(requester === null) return null;
+                let checkoutRes = this.event.checkoutMaterials(materialName, quantity, requester);
+                if(!checkoutRes[0]) return([false, null, null]);
+                let depLocation : string = requester.location != null ? requester.location : 
+                `UNKNOWN: LOCATION OF ${requester.screenName} -- CONTACT ADMINISTRATOR`;
+                let reqTask : task = {supervisor: requester, runnerRequest: false, recieveLocation: "HOME BASE", depositLocation: depLocation, 
+                                        item: materialName, quantity: quantity};
+                let res = this.event.addTask(reqTask);
+                 return([res[0], res[1], res[2]]);
             }
         }
         else {
-            return this.event.requestRunner(eventName, requesterScreenName)
+            let requester = this.event.getAdminBySocket(socketId);
+            if(requester === null) requester = this.event.getSupervisorBySocket(socketId);
+            if(requester === null) return null;
+            let depLocation : string = requester.location != null ? requester.location : 
+            `UNKNOWN: LOCATION OF ${requester.screenName} -- CONTAC T ADMINISTRATOR`;
+            let reqTask : task = {supervisor: requester, runnerRequest: true, recieveLocation: "YOUR LOCATION", depositLocation: depLocation};
+            let res = this.event.addTask(reqTask);
+            return([res[0], res[1], res[2]]);
         }
     }
 
-    public cancelTask(eventName: string, runnerScreenName: string) : [task | null, runner | null, supervisor | admin] | null{
-        return this.event.deleteTask(eventName, runnerScreenName);
+    public cancelTask(eventName: string, runnerName: string) : [task | null, runner | null, supervisor | admin] | null{
+        let runner = this.event.getRunnerByScreenName(runnerName);
+        if(runner === null) return null;
+        let targetTask = runner.task;
+        if(targetTask === null) return null;
+        if(targetTask.item !== undefined && targetTask.quantity !== undefined) {
+            if(targetTask.item instanceof Array) {
+                if(targetTask.quantity instanceof Array) {
+                    for(let i = 0; i < targetTask.item.length; i++) {
+                        this.event.addFreeMaterials(targetTask.item[i], targetTask.quantity[i]);
+                    }
+                }
+            }
+            else {
+                if(!(targetTask.quantity instanceof Array)) {
+                    this.event.addFreeMaterials(targetTask.item, targetTask.quantity);
+                }
+            }
+        }
+        let requester = targetTask.supervisor;
+        let removeRes = this.event.removeTask(targetTask);
+        return [removeRes[0], removeRes[1], requester];
     }
 
-    public taskComplete(eventName: string, runnerScreenName: string) : [task | null, runner | null, supervisor | admin] | null {
-        return this.event.taskComplete(eventName, runnerScreenName);
+    public taskComplete(eventName: string, runnerName: string) : [task | null, runner | null, supervisor | admin] | null {
+        let runner = this.event.getRunnerByScreenName(runnerName);
+        if(runner === null) return null;
+        let targetTask = runner.task;
+        if(targetTask == null) return null;
+        let requester = targetTask.supervisor;
+        let removeRes = this.event.removeTask(targetTask);
+        return [removeRes[0], removeRes[1], requester];
     }
 }

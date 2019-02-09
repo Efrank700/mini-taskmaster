@@ -299,8 +299,9 @@ export class TaskMastrEvent{
                 const retAdmin : admin = this.admins[adminIndex];
                 retAdmin.tasks.forEach(element => {
                     let res = this.removeTask(element);
-                    if(res[1] != null) {
-                        runners.concat(res[1]);
+                    let target = res[1]
+                    if(target != null) {
+                        runners.concat(target);
                     }
                 });
                 this.admins.splice(adminIndex, 1);
@@ -325,8 +326,9 @@ export class TaskMastrEvent{
                 let retSupervisor : supervisor = this.supervisors[supervisorIndex];
                 retSupervisor.tasks.forEach(element => {
                     let res = this.removeTask(element);
-                    if(res[1] != null) {
-                        runners.concat(res[1]);
+                    let target = res[1]
+                    if(target != null) {
+                        runners.concat(target);
                     }
                 });
                 this.supervisors.splice(supervisorIndex, 1);
