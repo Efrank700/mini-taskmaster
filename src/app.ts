@@ -47,6 +47,9 @@ app.post('/login', (req, res) => {
             res.status(403);
             res.json({"error": "Incorrect User Key"});
         }
+        else if(participantTypes.admin == addition[1]) {
+            
+        }
     }
 })
 
