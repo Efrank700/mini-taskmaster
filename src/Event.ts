@@ -23,7 +23,7 @@ export class TaskMastrEvent{
     private unfinishedTasks: {assigned: runner | null, task: task}[];
     private waitingTasks: {id: number, task: task}[]; //Tasks currently waiting to be assigned.
     private SUPERADMIN: admin = {screenName: this.eventName, roomName: this.eventName, tasks: [], 
-                                 location: "HOME BASE", socketId: 0};
+                                 location: "HOME BASE"};
     /**
      * @constructor
      * @param eventName 
@@ -173,12 +173,14 @@ export class TaskMastrEvent{
      * @param admin
      * @returns
      */
-     addAdmin(admin: admin) : admin {
+     addAdmin(admin: admin) : admin | null {
         helper.uniqueInsert(admin, this.admins);
         return(admin);
     }
 
-     addSupervisor(supervisor: supervisor) : supervisor{
+     addSupervisor(supervisor: supervisor) : supervisor | null{
+        let exists = this.getSupervisorByScreenName(supervisor.screenName);
+        if(exists)
         helper.uniqueInsert(supervisor, this.supervisors);
         return(supervisor);
     }
@@ -187,7 +189,7 @@ export class TaskMastrEvent{
      * @param runner to be added
      * @returns runner added
      */
-     addRunner(runner: runner) : runner {
+     addRunner(runner: runner) : runner | null {
         if(runner.task !== null) {
             helper.uniqueInsert(runner, this.taskedRunners);
             return(runner);
@@ -253,35 +255,35 @@ export class TaskMastrEvent{
      * @param socketId
      * @returns admin target Admin 
      */
-     getAdminBySocket(socketId: number) : admin | null{
-        const found: number = (this.admins.findIndex((targetAdmin) => {return(targetAdmin.socketId === socketId)}));
-        if(found === -1) return(null);
-        else return(this.admins[found]);
-    }
+    //  getAdminBySocket(socketId: number) : admin | null{
+    //     const found: number = (this.admins.findIndex((targetAdmin) => {return(targetAdmin.socketId === socketId)}));
+    //     if(found === -1) return(null);
+    //     else return(this.admins[found]);
+    // }
 
-    /**
-     * @param socketId
-     * @returns supervisor target supervisor 
-     */
-     getSupervisorBySocket(socketId: number) : supervisor | null{
-        const found: number = (this.supervisors.findIndex((targetSup) => {return(targetSup.socketId === socketId)}));
-        if (found === -1) return(null);
-        else return(this.supervisors[found]);
-    }
+    // /**
+    //  * @param socketId
+    //  * @returns supervisor target supervisor 
+    //  */
+    //  getSupervisorBySocket(socketId: number) : supervisor | null{
+    //     const found: number = (this.supervisors.findIndex((targetSup) => {return(targetSup.socketId === socketId)}));
+    //     if (found === -1) return(null);
+    //     else return(this.supervisors[found]);
+    // }
 
-    /**
-     *@param socketId
-     *@return runner target runner 
-     */
-      getRunnerBySocket(socketId: number) : runner | null{
-       const freePos = this.freeRunners.findIndex((targetRunner) => {return targetRunner.socketId === socketId});
-       if(freePos !== -1) return(this.freeRunners[freePos]);
-       else{
-           const taskedPos = this.taskedRunners.findIndex((targetRunner) => {return targetRunner.socketId === socketId});
-           if(taskedPos !== -1) return(this.taskedRunners[taskedPos]);
-           else return(null);
-       }
-    }
+    // /**
+    //  *@param socketId
+    //  *@return runner target runner 
+    //  */
+    //   getRunnerBySocket(socketId: number) : runner | null{
+    //    const freePos = this.freeRunners.findIndex((targetRunner) => {return targetRunner.socketId === socketId});
+    //    if(freePos !== -1) return(this.freeRunners[freePos]);
+    //    else{
+    //        const taskedPos = this.taskedRunners.findIndex((targetRunner) => {return targetRunner.socketId === socketId});
+    //        if(taskedPos !== -1) return(this.taskedRunners[taskedPos]);
+    //        else return(null);
+    //    }
+    // }
     
     /**
      * @param admin administrator to be removed

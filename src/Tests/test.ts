@@ -5,13 +5,13 @@ import {TaskMastrEvent} from '../Event';
 import {task} from "../task";
 import {participant, admin, supervisor, runner} from "../Participant";
 
-const genAdmin: admin = {screenName: "hello", roomName: "hello", tasks: <task[]>[], location: null, socketId: 10};
-const secondAdmin: admin = {screenName: "hi", roomName: "hello", tasks: <task[]>[], location: null, socketId: 9};
-const falseAdmin: admin = {screenName: "not", roomName: "hello", tasks: <task[]>[], location: null, socketId: 9};
-const genSupervisor: supervisor = {screenName: "wow", roomName: "hello", tasks: <task[]>[], location: "null", socketId: 11};
-const falseSupervisor: supervisor = {screenName: "nope", roomName: "hello", tasks: <task[]>[], location: "null", socketId: 12};
-const genRunner: runner = {screenName: "woot", roomName: "hello", task: null, socketId: 15};
-const falseRunner: runner = {screenName: "haha", roomName: "hello", task: null, socketId: 15};
+const genAdmin: admin = {screenName: "hello", roomName: "hello", tasks: <task[]>[], location: null};
+const secondAdmin: admin = {screenName: "hi", roomName: "hello", tasks: <task[]>[], location: null};
+const falseAdmin: admin = {screenName: "not", roomName: "hello", tasks: <task[]>[], location: null};
+const genSupervisor: supervisor = {screenName: "wow", roomName: "hello", tasks: <task[]>[], location: "null"};
+const falseSupervisor: supervisor = {screenName: "nope", roomName: "hello", tasks: <task[]>[], location: "null"};
+const genRunner: runner = {screenName: "woot", roomName: "hello", task: null};
+const falseRunner: runner = {screenName: "haha", roomName: "hello", task: null};
 
 describe('Event Generation', () => {
     const newEvent = new TaskMastrEvent("hello", 100, 101, 102, genAdmin.screenName, <{itemName: string, count: number}[]>[]);

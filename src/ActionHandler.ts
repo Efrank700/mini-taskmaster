@@ -27,36 +27,34 @@ export class ActionHandler {
         return this.key3;
     }
 
-    public addUserToEvent(screen: string, socket: number,  
-        eventKey: number, location?: string): [boolean, participantTypes] {
+    public addUserToEvent(screen: string, eventKey: number, 
+        location?: string): [boolean, participantTypes, string] {
         if(eventKey === this.event.$adminKey) {
             let adminLocation = location === undefined ? null : location;
             let adminToAdd: admin = {screenName: screen, 
                                         roomName: this.event.$eventName,
                                         location: adminLocation,
-                                        tasks: [],
-                                        socketId: socket};
+                                        tasks: []};
             let success = this.event.addAdmin(adminToAdd);
-            return([true, participantTypes.admin]);
+            return([true, participantTypes.admin, screen]);
         }
         else if(eventKey === participantTypes.supervisor) {
-            if(location === undefined) return [false, participantTypes.supervisor];
+            if(location === undefined) return [false, participantTypes.supervisor, screen];
             let supervisorToAdd: supervisor = {screenName: screen,
                                                 roomName: this.event.$eventName,
                                                 location: location,
-                                                tasks: [],
-                                                socketId: socket};
+                                                tasks: []};
             let success = this.event.addSupervisor(supervisorToAdd);
-            return([true, participantTypes.supervisor]);
+            return([true, participantTypes.supervisor, screen]);
         }
-        else {
+        else if(eventKey == this.runnerKey) {
             let runnerToAdd: runner = {screenName: screen,
                                         roomName: this.event.$eventName,
-                                        task: null,
-                                        socketId: socket};
+                                        task: null};
             let success = this.event.addRunner(runnerToAdd);
-            return([success.task != null, participantTypes.runner]);
+            return([success.task != null, participantTypes.runner, screen]);
         }
+        else return [false, participantTypes.admin, screen];
     }
 
     // public kick(authorizingSocket: number, targetScreen: string, eventKey: number): 
@@ -141,11 +139,11 @@ export class ActionHandler {
     //     }
     // }
 
-    public logUserOut(socket: number): 
+    public logUserOut(screenName: string): 
     [admin | null, supervisor | null, runner | null, runner[] | null, boolean] | null {
-        let targetAdmin = this.event.getAdminBySocket(socket);
-        let targetSupervisor = this.event.getSupervisorBySocket(socket);
-        let targetRunner = this.event.getRunnerBySocket(socket);
+        let targetAdmin = this.event.getAdminByScreenName(screenName);
+        let targetSupervisor = this.event.getSupervisorByScreenName(screenName);
+        let targetRunner = this.event.getRunnerByScreenName(screenName);
 
         if(targetAdmin === null && targetRunner === null && targetSupervisor === null) return null;
         else {
@@ -194,7 +192,7 @@ export class ActionHandler {
         return this.event.taskList();
     }
 
-    public addTask(eventName: string, socketId: number, userRequest: boolean, 
+    public addTask(screenName: string, userRequest: boolean, 
     materialName?: string, quantity?: number):
     [boolean, task | null, runner | null] | null {
         if(!userRequest && (materialName === undefined || quantity === undefined)) return null;
@@ -204,8 +202,8 @@ export class ActionHandler {
             if(userRequest) {
                 let possible = this.event.requestValid(materialName, quantity);
                 if(!possible) return([false, null, null]);
-                let requester = this.event.getAdminBySocket(socketId);
-                if(requester === null) requester = this.event.getSupervisorBySocket(socketId);
+                let requester = this.event.getAdminByScreenName(screenName);
+                if(requester === null) requester = this.event.getSupervisorByScreenName(screenName);
                 if(requester === null) return null;
                 let checkoutRes = this.event.checkoutMaterials(materialName, quantity, requester);
                 if(!checkoutRes[0]) return([false, null, null]);
@@ -219,8 +217,8 @@ export class ActionHandler {
             else {
                 let possible = this.event.requestValid(materialName, quantity);
                 if(!possible) return([false, null, null]);
-                let requester = this.event.getAdminBySocket(socketId);
-                if(requester === null) requester = this.event.getSupervisorBySocket(socketId);
+                let requester = this.event.getAdminByScreenName(screenName);
+                if(requester === null) requester = this.event.getSupervisorByScreenName(screenName);
                 if(requester === null) return null;
                 let checkoutRes = this.event.checkoutMaterials(materialName, quantity, requester);
                 if(!checkoutRes[0]) return([false, null, null]);
@@ -233,8 +231,8 @@ export class ActionHandler {
             }
         }
         else {
-            let requester = this.event.getAdminBySocket(socketId);
-            if(requester === null) requester = this.event.getSupervisorBySocket(socketId);
+            let requester = this.event.getAdminByScreenName(screenName);
+            if(requester === null) requester = this.event.getSupervisorByScreenName(screenName);
             if(requester === null) return null;
             let depLocation : string = requester.location != null ? requester.location : 
             `UNKNOWN: LOCATION OF ${requester.screenName} -- CONTAC T ADMINISTRATOR`;

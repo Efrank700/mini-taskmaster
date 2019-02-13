@@ -34,8 +34,12 @@ gulp.task('watchActionHandler', ['scripts'], () => {
   gulp.watch(['./src/ActionHandler.ts'], ['scripts']);
 })
 
+gulp.task('watchApp', ['scripts'], function() {
+  gulp.watch(['./src/app.ts'], ['scripts']);
+})
+
 gulp.task('checkEvent',['watchEvent', 'mocha_event']);
 
-gulp.task('checkProj', ['checkEvent', 'watchActionHandler']);
+gulp.task('checkProj', ['checkEvent', 'watchActionHandler', 'watchApp']);
 
 gulp.task('default', ['checkProj', 'assets']);

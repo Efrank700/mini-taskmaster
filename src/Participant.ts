@@ -3,7 +3,6 @@ export {task}
 export interface participant {
     screenName: string,
     roomName: string,
-    socketId: number
 }
 
 export enum participantTypes {
@@ -15,7 +14,6 @@ export interface admin{
     roomName: string,
     location: string | null,
     tasks: task[],
-    socketId: number
 }
 
 export interface supervisor{
@@ -23,12 +21,10 @@ export interface supervisor{
     roomName: string,
     location: string,
     tasks: task[],
-    socketId: number
 }
 
 export interface runner extends participant{
     screenName: string,
     roomName: string,
     task: task | null,
-    socketId: number
 }

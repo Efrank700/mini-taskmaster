@@ -6,7 +6,7 @@ export class SocketIdStore {
 
     private sockets: number[];
     private ids: number[];
-
+    private count: number = 0;
     constructor() {
         this.sockets = [];
         this.ids = [];
