@@ -35,7 +35,11 @@ let server = createServer(app);
 
 
 app.get('/', (req, res) => {
-    res.render("socketTest.handlebars", {title: "test"});
+    
+})
+
+app.get('/login', (req, res) => {
+
 })
 
 app.post('/login', (req, res) => {
@@ -48,10 +52,65 @@ app.post('/login', (req, res) => {
             res.json({"error": "Incorrect User Key"});
         }
         else if(participantTypes.admin == addition[1]) {
-            
+
         }
     }
 })
 
+app.post('/logout', (req, res) => {
+
+})
+
+app.get('/runner', (req, res) => {
+    
+})
+
+app.post('/runner', (req, res) => {
+    
+})
+
+app.post('/upLoc', (req, res) => {
+
+})
+
+app.post('/makeTask', (req, res) => {
+
+})
+
+app.post('/cancelTask', (req, res) => {
+
+})
+
+app.post('/completeTask', (req, res) => {
+
+})
+
+app.get('/supervisor', (req, res) => {
+    
+})
+
+app.post('/supervisor', (req, res) => {
+    
+})
+
+app.post('/remMat', (req, res) => {
+    
+})
+
+app.post('/addMat', (req, res) => {
+    
+})
+
+app.post('/getMat', (req, res) => {
+    
+})
+
+app.get('/admin', (req, res) => {
+    
+})
+
+app.post('/admin', (req, res) => {
+    
+})
 
 server.listen(3000, () => console.log('Example app listening on port 3000!'))
