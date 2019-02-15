@@ -1,0 +1,117 @@
+<h3 class="text-center">Introduction to SOUP TaskMastr</h3>
+
+<div class="container border bg-light">
+    <p>TaskMastr is a volunteer and material managment system developed with SOUP in mind</p>
+    <p>The system utilizes 3 different levels of authorization: Runner, Supervisor, and Administrator</p>
+    <h3 class="text-center">Please read the guide on your role before entering the system</h3>
+</div>
+<div class="offset-md-2 col-md-8">
+    <div id="accordion">
+  <div class="card">
+    <div class="card-header" id="headingOne">
+      <h5 class="mb-0">
+        <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+          Administrator
+        </button>
+      </h5>
+    </div>
+
+    <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+      <div class="card-body">
+            <p>
+                Administrators are responsible for the management of SOUP as a whole. Within TaskMastr, they have authority
+                over people, materials, and coordination. They are also responsible for ensuring that those assigned with tasks carry them out, either via slack or direct communication.
+            </p>
+            <p>
+                Administrators can create tasks. Tasks are requests for either materials or people to the adminstrator's current location. These tasks can be created and submitted via the "create task" button on the admin interface. The tasks are automatically assigned to available runners, who then carry them out.
+            </p>
+            <p>
+                Administrators can also cancel tasks or mark them as complete. The difference is small but important. 
+                Canceling a task returns both the materials and runner to HQ and removes the task from the queue.
+                Marking a task as complete will send the runner back to HQ, but will keep the materials under your jurisdiction. Additionally, this means that if you requested a volunteer for extra hands, you should not mark the task as complete until <strong>AFTER</strong> you are done with them.
+            </p>
+
+            <p>
+                Administrators are responsible for adding any new materials or removing any that have broken. This can be done through the "add materials" and "remove materials"
+                buttons present on the administrator dashboard.
+            </p>
+            <p>
+                Administrators are supposed to have an overview of all events occuring in SOUP. Therefore, their console is equipped with a view of ALL
+                current tasks and materials, as well as the ability to modify all of them. However, it is strongly suggested that administrators <strong>do not</strong> cancel tasks
+                outside of their own without heavy consultation of the other party.
+            </p>
+            <p>
+                It is understandable that administrators may be moving around during the tournament. TaskMastr uses your input location to automatically update any tasks you have made. Therefore,
+                you should always use the "update location" button to ensure that volunteers end up in the right place at the right time.
+            </p>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header" id="headingTwo">
+      <h5 class="mb-0">
+        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+          Supervisor
+        </button>
+      </h5>
+    </div>
+    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+        <div class="card-body">
+            <p>
+                Supervisors are responsible for the management of events before, during, and after the competition.
+            </p>
+            <p>
+                Supervisors can create tasks. Tasks are requests for either materials or people to the supervisor's current location. These tasks can be created and submitted via the "create task" button on the admin interface. The tasks are automatically assigned to available runners, who then carry them out.
+            </p>
+            <p>
+                Supervisors can also cancel tasks or mark them as complete. The difference is small but important. 
+                Canceling a task returns both the materials and runner to HQ and removes the task from the queue.
+                Marking a task as complete will send the runner back to HQ, but will keep the materials under your jurisdiction. Additionally, this means that if you requested a volunteer for extra hands, you should not mark the task as complete until <strong>AFTER</strong> you are done with them.
+            </p>
+            <p>
+                It is understandable that supervisors may be moving around during the tournament. TaskMastr uses your input location to automatically update any tasks you have made. Therefore,
+                you should always use the "update location" button to ensure that volunteers end up in the right place at the right time.
+            </p>
+        </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header" id="headingThree">
+      <h5 class="mb-0">
+        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+          Runner
+        </button>
+      </h5>
+    </div>
+    <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+        <div class="card-body">
+            <p>
+                Runners (or volunteers) are the heart and soul of SOUP, making sure that things flow smoothly from start to finish. They are
+                responsible for providing extra hands or extra materials where needed throughout the day.
+            </p>
+            <p>
+                Runners are assigned to tasks. If you are assigned a task, you will see it show up on your dashboard. As soon as you see the request, you should
+                 begin to carry it out. The task will have a location you should go to, as well as potentially having materials you should bring.
+            </p>
+            <p>
+                If you are instructed to bring materials, they can be retreived from HQ.
+            </p>
+
+            <p>
+                Your dashboard will always reflect your current task. If you see that your task disappears, don't worry. It is likely that the supervisor or
+                 administrator resolved the situation and has therefore canceled the task request.
+            </p>
+            <p>
+                As a runner, you are responsible for staying in the queue as long as you are volunteering. Please note that, at this time, 
+                TaskMastr is not capable of producing notifications, so make sure you're paying attention to it.
+            </p>
+        </div>
+    </div>
+  </div>
+</div>
+</div>
+<h3 class="text-center">Please hit the logout button as you exit the system for the last time!</h3>
+<h4 class="text-center">This ensures everything runs smoothly and easily</h4>
+<div class="container text-center">
+    <a href="/login" class="btn btn-block btn-primary"><h2>LOGIN</h2></a>
+</div>

@@ -1,0 +1,261 @@
+<script>
+    var dataStorageT;
+    function deleteT(target) {
+        if(dataStorageT && target < dataStorageT.length) {
+            if(dataStorageT[target].assigned !== null) {
+                $.post('/cancelTask', {runnerName: dataStorageT[target].assigned})
+            }
+        }
+    }
+
+    function succeedT(target) {
+        if(dataStorageT && target < dataStorageT.length) {
+            if(dataStorageT[target].assigned !== null) {
+                $.post('/completeTask', {runnerName: dataStorageT[target].assigned})
+            }
+        }
+    }
+    var dataStorageA;
+    function deleteA(target) {
+        if(dataStorageA && target < dataStorageA.length) {
+            if(dataStorageA[target].assigned !== null) {
+                $.post('/cancelTask', {runnerName: dataStorageA[target].assigned})
+            }
+        }
+    }
+
+    function succeedA(target) {
+        if(dataStorageA && target < dataStorageA.length) {
+            if(dataStorageA[target].assigned !== null) {
+                $.post('/completeTask', {runnerName: dataStorageA[target].assigned})
+            }
+        }
+    }
+</script>
+<nav class="navbar navbar-light bg-light">
+    <h3 class="">{{screen}}</h3>
+    <button type="button" class="btn btn-primary ml-auto mr-auto" data-toggle="modal" data-target="#exampleModal">
+        Create new task
+    </button>
+    <form action="/logout" method="POST">
+        <input type="submit" class="btn btn-danger ml-auto">
+    </form>
+</nav>
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Task Request</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+            <form action="/makeTask" method="POST">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" name="userRequest" id="userRequest">
+                    <label class="form-check-label" for="userRequest">I need the volunteer to stay and help</label>
+                </div>
+                <br>
+                    <div class="form-group">
+                        <label for="materialName">Material name</label>
+                        <input type="text" class="form-control" id="materialName" aria-describedby="mathelp" placeholder="123456789" name="materialName">
+                        <small id="mathelp" class="form-text text-muted">Enter the name of the material you need</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantity">Quantity</label>
+                        <input type="text" class="form-control" id="quantity" placeholder="10" name="quantity">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row col-md-10 offset-md-1">
+    <div class="col-md-6">
+        <div class="text-center">
+            <h4>Add Material</h4>
+        </div>
+        <form action="/addMat" method="POST">
+            <div class="form-group">
+                        <label for="materialName">Material name</label>
+                        <input type="text" class="form-control" id="materialName" aria-describedby="mathelp" placeholder="123456789" name="materialName">
+                        <small id="mathelp" class="form-text text-muted">Enter the name of the material you need</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantity">Quantity</label>
+                        <input type="text" class="form-control" id="quantity" placeholder="10" name="quantity">
+                    </div>
+                <button type="submit" class="btn btn-primary">Add!</button>
+        </form>
+        <div class="text-center">
+            <h4>Your used materials</h4>
+        </div>
+        <div class="col-md-8 offset-md-2" id="personalMats">
+
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="text-center">
+            <h4>Remove Material</h4>
+        </div>
+        <form action="/addMat" method="POST">
+            <div class="form-group">
+                        <label for="materialName">Material name</label>
+                        <input type="text" class="form-control" id="materialName" aria-describedby="mathelp" placeholder="123456789" name="materialName">
+                        <small id="mathelp" class="form-text text-muted">Enter the name of the material you need</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantity">Quantity</label>
+                        <input type="text" class="form-control" id="quantity" placeholder="10" name="quantity">
+                    </div>
+                <button type="submit" class="btn btn-danger">Remove!</button>
+        </form>
+        <div class="text-center">
+            <h4>Available Materials</h4>
+        </div>
+        <div class="col-md-8 offset-md-2" id="availMats">
+            
+        </div>
+    </div>
+</div>
+<br>
+<br>
+<div class="col-md-8 offset-md-2 text-center">
+    <div class="text-center">
+        <h4>Your Tasks</h4>
+    </div>
+    <div class="col-md-8 offset-md-2" id="tasks">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">assigned</th>
+                    <th scope="col">material</th>
+                    <th scope="col">quantity</th>
+                    <th scope="col">assistance request</th>
+                </tr>
+            </thead>
+            <tbody id="tbody">
+
+            </tbody>
+        </table>
+    </div>
+</div>
+<br>
+<br>
+<div class="col-md-8 offset-md-2 text-center">
+    <div class="text-center">
+        <h4>All Tasks</h4>
+    </div>
+    <div class="col-md-8 offset-md-2">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">assigned</th>
+                    <th scope="col">requester</th>
+                    <th scope="col">material</th>
+                    <th scope="col">quantity</th>
+                    <th scope="col">assistance request</th>
+                </tr>
+            </thead>
+            <tbody id="allTasks">
+
+            </tbody>
+        </table>
+    </div>
+</div>
+<br>
+<br>
+<div class="col-md-8 offset-md-2 text-center">
+    <div class="text-center">
+        <h4>All Used materials</h4>
+    </div>
+    <div class="col-md-8 offset-md-2">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">material</th>
+                    <th scope="col">quantity</th>
+                    <th scope="col">holder</th>
+                </tr>
+            </thead>
+            <tbody id="allMat">
+
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    setTimeout(function() {
+        $.post("/supervisor", function(data) {
+            var freeMaterials = data.freeMat;
+            var usedMaterials = data.myMat;
+            var myTasks = data.myTasks;
+            var allMats = data.used;
+            var allTasks = data.tasks;
+            if(freeMaterials) {
+                var freeMatList = "<ul>"
+                for (var i = 0; i < freeMaterials.length; i++) {
+                    freeMatList += "<li>" + freeMaterials[i].itemName + ": " + freeMaterials[i].count + "</li>"
+                }
+                freeMatList += "</ul>"
+                $("#availMats").html(freeMatList)
+            }
+            if(usedMaterials) {
+                var usedMatList = "<ul>"
+                for (var i = 0; i < usedMaterials.length; i++) {
+                    usedMatList += "<li>" + usedMaterials[i].itemName + ": " + usedMaterials[i].count + "</li>"
+                }
+                usedMatList += "</ul>"
+                $("#personalMats").html(usedMatList)
+            }
+            if(allMats){
+                $("#allMat").html("")
+                var allMatList = ""
+                for (var i = 0; i < allMats.length; i++) {
+                    allMatList += "<tr><th>" + allMats[i].itemName + "</th><th>" + allMats[i].count + "</th><th>" + allMats[i].user.screenName + "</th></tr>"
+                }
+                
+                
+                $("#allMat").html(allMatList)
+            }
+            if(myTasks) {
+                $("#tbody").html("")
+                dataStorageT = myTasks
+                for (var i = 0; i < myTasks.length; i++) {
+                    if(myTasks[i].assigned !== null) {
+                        var endStr = "<tr><td>" + myTasks[i].assigned.screenName + "</td><td>" + 
+                                (myTasks[i].item?myTasks[i].item:"none</td><td>") + (myTasks[i].quantity?myTasks[i].quantity:"none</td><td>") + 
+                                "<button class=\"btn btn-danger\" onclick=\"deleteT(" + i + ")\">Delete</button>"+
+                                "<button class=\"btn btn-success\" onclick=\"succeedT(" + i + ")\">Complete</button></tr>" 
+                        $("#tbody").html($("#tbody").html() + endStr)
+                    }
+                    else {
+                        var endStr = "<tr><td>No</td><td>" + 
+                                (myTasks[i].item?myTasks[i].item:"none")  + "</td><td>" + (myTasks[i].quantity?myTasks[i].quantity:"none") + "</td></tr>" 
+                        $("#tbody").html($("#tbody").html() + endStr)
+                    }
+                }
+            }
+            if(allTasks) {
+                $("#allTasks").html("")
+                dataStorageA = allTasks
+                for (var i = 0; i < allTasks.length; i++) {
+                    if(allTasks[i].assigned !== null) {
+                        var endStr = "<tr><td>" + allTasks[i].assigned.screenName + "</td><td>" + allTasks[i].supervisor.screenName + "</td><td>" +
+                                (allTasks[i].item?allTasks[i].item:"none</td><td>") + (allTasks[i].quantity?allTasks[i].quantity:"none</td><td>") + 
+                                "<button class=\"btn btn-danger\" onclick=\"deleteA(" + i + ")\">Delete</button>"+
+                                "<button class=\"btn btn-success\" onclick=\"succeedA(" + i + ")\">Complete</button></tr>" 
+                        $("#allTasks").html($("#allTasks").html() + endStr)
+                    }
+                    else {
+                        var endStr = "<tr><td>No</td><td>"  + allTasks[i].supervisor.screenName + "</td><td>" + 
+                                (allTasks[i].item?allTasks[i].item:"none")  + "</td><td>" + (allTasks[i].quantity?allTasks[i].quantity:"none") + "</td></tr>" 
+                        $("#allTasks").html($("#allTasks").html() + endStr)
+                    }
+                }
+            }
+        })
+    }, 10000);
+</script>

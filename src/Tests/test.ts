@@ -73,9 +73,11 @@ describe('Participant Removal', () => {
     })
     it('can ignore unrelated supervisors', () => {
         newEvent.addSupervisor(genSupervisor);
-        let result = newEvent.removeSupervisor(falseSupervisor);
-        expect(result).to.equal(null);
         expect(newEvent.supervisorList().length).to.equal(1);
+        let result = newEvent.removeSupervisor(falseSupervisor);
+        expect(result).to.be.null;
+        
+        
     })
     it('can ignore unrelated runners', () => {
         let result = newEvent.removeRunner(falseRunner);
@@ -139,10 +141,15 @@ describe("Task Manipulations", () => {
 
     it("Assigns task when runner is added", () => {
         let result = newEvent.addRunner(genRunner);
-        expect(result.task).to.equal(genTask);
-        expect(newEvent.taskList().length).to.equal(1);
-        expect(newEvent.taskList()[0].assigned).to.equal(genRunner);
-        expect(newEvent.taskList()[0].task).to.equal(genTask);
+        if(result == null) {
+            expect(0).to.equal(1);
+        }
+        else{
+            expect(result.task).to.equal(genTask);
+            expect(newEvent.taskList().length).to.equal(1);
+            expect(newEvent.taskList()[0].assigned).to.equal(genRunner);
+            expect(newEvent.taskList()[0].task).to.equal(genTask);
+        }
     })
 
     it("Behaves properly when task is removed", () => {
