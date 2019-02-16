@@ -12,12 +12,10 @@ import * as jwt from "jsonwebtoken";
 import * as session from "express-session"
 import * as uuid from "uuid";
 import { participantTypes } from "./Participant";
-import * as session_fs from "session-file-store";
 import { isArray } from "util";
 
 let app = express();
 
-let FileStore = session_fs(session);
 app.use(helmet());
 app.use(BodyParser.urlencoded({extended: true}));
 app.use(BodyParser.json());
@@ -220,31 +218,32 @@ app.post('/upLoc', (req, res) => {
     if(req.session && req.session.key && req.session.screen) {
         if(req.session.key == actionHander.adminKey) {
             if(!req.body.location) {
-                res.json({success: false});
+                res.render('admin', {screen: req.session.screen, error: "no location provided"});
             }
             else {
                 let admin = actionHander.getAdminByScreenName(req.session.screen);
                 if(admin == null) {
-                    res.json({success: false});
+                    res.render('admin', {screen: req.session.screen, logicError: "no such admin found"});
                 }
                 else {
                     admin.location = req.body.location;
-                    res.json({success: true});
+                    res.render('admin', {flash: "location updated!"})
                 }
             }
         }
         else if(req.session.key == actionHander.superKey) {
             if(!req.body.location) {
-                res.json({success: false});
+                res.render('supervisor', {screen: req.session.screen, error: "no location provided"});
+                
             }
             else {
                 let admin = actionHander.getSupervisorByScreenName(req.session.screen);
                 if(admin == null) {
-                    res.json({success: false});
+                    res.render('supervisor', {screen: req.session.screen, logicError: "no such supervisor found"});
                 }
                 else {
                     admin.location = req.body.location;
-                    res.json({success: true});
+                    res.render('supervisor', {flash: "location updated!"})
                 }
             }
         }
@@ -270,45 +269,35 @@ app.post('/upLoc', (req, res) => {
 app.post('/makeTask', (req, res) => {
     if(req.session && req.session.key && req.session.screen) {
         if(req.session.key == actionHander.adminKey) {
-            if(req.body.userRequest == undefined) {
-                res.json({success: false});
+            if(!req.body.userRequest && (!req.body.material || !req.body.quantity)) {
+                res.render('admin', {screen: req.session.screen, error: "you must request someone or something"});
             }
             else {
-                if(!req.body.userRequest && (!req.body.materialName || !req.body.quantity)) {
-                    res.json({success: false});
-                }
-                else {
-                    if(req.body.materialName && req.body.quantity) {
-                        let request = actionHander.addTask(req.session.screen, req.body.userRequest,
-                            participantTypes.admin, req.body.materialName, parseInt(req.body.quantity));
-                        if (request == null || request == [false, null, null]) {
-                            res.render('admin', {logicError: "Task Unable to be added, please review request and try again"});
-                        }
-                        else {
-                            res.render('admin')
-                        }
+                if(req.body.material && req.body.quantity) {
+                    let request = actionHander.addTask(req.session.screen, req.body.userRequest,
+                        participantTypes.admin, req.body.material, parseInt(req.body.quantity));
+                    if (request == null || request == [false, null, null]) {
+                        res.render('admin', {screen: req.session.screen, logicError: "Task Unable to be added, please review request and try again"});
+                    }
+                    else {
+                        res.render('admin', {screen: req.session.screen,})
                     }
                 }
             }
         }
         else if(req.session.key == actionHander.superKey) {
-            if(req.body.userRequest == undefined) {
-                res.json({success: false});
+            if(!req.body.userRequest && (!req.body.material || !req.body.quantity)) {
+                res.render('supervisor', {screen: req.session.screen, error: "you must request someone or something"});
             }
             else {
-                if(!req.body.userRequest && (!req.body.materialName || !req.body.quantity)) {
-                    res.json({success: false});
-                }
-                else {
-                    if(req.body.materialName && req.body.quantity) {
-                        let request = actionHander.addTask(req.session.screen, req.body.userRequest,
-                            participantTypes.supervisor, req.body.materialName, parseInt(req.body.quantity));
-                        if (request == null || request == [false, null, null]) {
-                            res.render('supervisor', {logicError: "Task Unable to be added, please review request and try again"});
-                        }
-                        else {
-                            res.render('supervisor')
-                        }
+                if(req.body.material && req.body.quantity) {
+                    let request = actionHander.addTask(req.session.screen, req.body.userRequest,
+                        participantTypes.supervisor, req.body.material, parseInt(req.body.quantity));
+                    if (request == null || request == [false, null, null]) {
+                        res.render('supervisor', {screen: req.session.screen, logicError: "Task Unable to be added, please review request and try again"});
+                    }
+                    else {
+                        res.render('supervisor', {screen: req.session.screen})
                     }
                 }
             }
@@ -336,23 +325,23 @@ app.post('/cancelTask', (req, res) => {
     if(req.session && req.session.key && req.session.screen) {
         if(req.session.key == actionHander.adminKey) {
             if(req.body.runnerName == undefined) {
-                res.json({success: false});
+                res.render('admin', {screen: req.session.screen, logicError: "no runner on task"});
             }
             else {
                 let result = actionHander.cancelTask(req.body.runnerName)
                 if (result == null) {
-                    res.render('supervisor', {logicError: "Task unable to be located properly"})
+                    res.render('admin', {screen: req.session.screen, logicError: "Task unable to be located properly"})
                 }
             }
         }
         else if(req.session.key == actionHander.superKey) {
             if(req.body.runnerName == undefined) {
-                res.json({success: false});
+                res.render('supervisor', {screen: req.session.screen, logicError: "no runner on task"});
             }
             else {
                 let result = actionHander.cancelTask(req.body.runnerName)
                 if (result == null) {
-                    res.render('supervisor', {logicError: "Task unable to be located properly"})
+                    res.render('supervisor', {screen: req.session.screen, logicError: "Task unable to be located properly"})
                 }
             }
         }
@@ -379,23 +368,23 @@ app.post('/completeTask', (req, res) => {
     if(req.session && req.session.key && req.session.screen) {
         if(req.session.key == actionHander.adminKey) {
             if(req.body.runnerName == undefined) {
-                res.json({success: false});
+                res.render('admin', {screen: req.session.screen, logicError: "no runner on task"});
             }
             else {
                 let result = actionHander.taskComplete(req.body.runnerName)
                 if (result == null) {
-                    res.render('supervisor', {logicError: "Task unable to be located properly"})
+                    res.render('admin', {screen: req.session.screen, logicError: "Task unable to be located properly"})
                 }
             }
         }
         else if(req.session.key == actionHander.superKey) {
             if(req.body.runnerName == undefined) {
-                res.json({success: false});
+                res.render('supervisor', {screen: req.session.screen, logicError: "no runner on task"});
             }
             else {
                 let result = actionHander.taskComplete(req.body.runnerName)
                 if (result == null) {
-                    res.render('supervisor', {logicError: "Task unable to be located properly"})
+                    res.render('supervisor', {screen: req.session.screen, logicError: "Task unable to be located properly"})
                 }
             }
         }
@@ -421,10 +410,10 @@ app.post('/completeTask', (req, res) => {
 app.get('/supervisor', (req, res) => {
     if(req.session && req.session.key) {
         if(req.session.key == actionHander.adminKey) {
-            res.render('admin')
+            res.render('admin', {screen: req.session.screen})
         }
         else if(req.session.key == actionHander.superKey) {
-            res.render('supervisor')
+            res.render('supervisor', {screen: req.session.screen})
         }
         else if(req.session.key == actionHander.runnerKey) {
             renderRunner(req, res, req.session.screen, null, null)
@@ -451,12 +440,12 @@ app.post('/supervisor', (req, res) => {
         if(req.session.key == actionHander.superKey) {
             let allMat = actionHander.getMaterials();
             if(allMat) {
-                let freeMat = allMat[1];
-                let usedmat = allMat[0].filter((element) => {element.user.screenName == req.session!.screen})
+                let freeMats = allMat[1];
+                let usedmats = allMat[0].filter((element) => {element.user.screenName == req.session!.screen})
                 let allTasks = actionHander.getCurrentTasks().filter((element) => {
                     element.task.supervisor.screenName == req.session!.screen
                 })
-                res.json({freeMat: freeMat, used: usedmat, tasks: allTasks});
+                res.json({freeMat: freeMats, used: usedmats, tasks: allTasks});
             }
         }
         else {
@@ -473,13 +462,17 @@ app.post('/admin', (req, res) => {
         if(req.session.key == actionHander.adminKey) {
             let allMat = actionHander.getMaterials();
             if(allMat) {
-                let freeMat = allMat[1];
-                let usedmat = allMat[0].filter((element) => {element.user.screenName == req.session!.screen})
+                let freeMats = allMat[1];
+                let usedmats = allMat[0].filter((element) => {element.user.screenName == req.session!.screen})
+                let usedMatsRep = usedmats.map((target) => {
+                    return {itemName: target.itemName, count: target.count, user: target.user.screenName}
+                })
                 let allTasks = actionHander.getCurrentTasks();
                 let myTasks = allTasks.filter((element) => {
                     element.task.supervisor.screenName == req.session!.screen
                 })
-                res.json({freeMat: freeMat, used: allMat[0], tasks: allTasks, myMat: usedmat, mytask: myTasks});
+                console.log({freeMat: freeMats, used: allMat[0], tasks: allTasks, myMat: usedMatsRep, mytask: myTasks})
+                res.json({freeMat: freeMats, used: allMat[0], tasks: allTasks, myMat: usedMatsRep, mytask: myTasks});
             }
         }
         else {
@@ -495,18 +488,20 @@ app.post('/remMat', (req, res) => {
     if(req.session && req.session.key && req.session.screen) {
         if(req.session.key == actionHander.adminKey) {
             if(req.body.material == undefined || req.body.quantity == undefined) {
-                res.json({success: false});
+                res.render('admin', {screen: req.session.screen, error: "material or quantities no specified"});
             }
             else {
                 let result = actionHander.removeMaterials(req.body.material, parseInt(req.body.quantity))
-                res.json({success: result})
+                res.render('admin', {screen: req.session.screen, flash: "success"});
             }
         }
         else if(req.session.key == actionHander.superKey) {
             res.json({success: false});
+            console.log("here3")
         }
         else if(req.session.key == actionHander.runnerKey) {
             res.json({success: false});
+            console.log("here4")
         }
         else {
             req.session.destroy((err) => {
@@ -528,18 +523,20 @@ app.post('/addMat', (req, res) => {
     if(req.session && req.session.key && req.session.screen) {
         if(req.session.key == actionHander.adminKey) {
             if(req.body.material == undefined || req.body.quantity == undefined) {
-                res.json({success: false});
+                res.render('admin', {screen: req.session.screen, error: "material or quantities no specified"});
             }
             else {
-                let result = actionHander.removeMaterials(req.body.material, parseInt(req.body.quantity))
-                res.json({success: result})
+                let result = actionHander.addMaterials(req.body.material, parseInt(req.body.quantity))
+                res.render('admin', {screen: req.session.screen, flash: "success"});
             }
         }
         else if(req.session.key == actionHander.superKey) {
             res.json({success: false});
+            console.log("here")
         }
         else if(req.session.key == actionHander.runnerKey) {
             res.json({success: false});
+            console.log("not")
         }
         else {
             req.session.destroy((err) => {
@@ -587,10 +584,10 @@ app.post('/getMat', (req, res) => {
 app.get('/admin', (req, res) => {
     if(req.session && req.session.key) {
         if(req.session.key == actionHander.adminKey) {
-            res.render('admin')
+            res.render('admin', {screen: req.session.screen})
         }
         else if(req.session.key == actionHander.superKey) {
-            res.render('supervisor')
+            res.render('supervisor', {screen: req.session.screen})
         }
         else if(req.session.key == actionHander.runnerKey) {
             renderRunner(req, res, req.session.screen, null, null)
