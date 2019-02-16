@@ -190,6 +190,7 @@
     setInterval(function() {
         $.post("/admin", function(data) {
             var freeMaterials = data.freeMat;
+            console.log(freeMaterials)
             var usedMaterials = data.myMat;
             var myTasks = data.myTasks;
             var allMats = data.used;

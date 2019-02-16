@@ -68,7 +68,7 @@ app.get('/guide', (req, res) => {
 app.get('/', (req, res) => {
     if(req.session && req.session.key) {
         if(req.session.key == actionHander.adminKey) {
-            res.render('admin')
+            res.render('admin', {screen:req.body.screen})
         }
         else if(req.session.key == actionHander.superKey) {
             res.render('supervisor')
@@ -94,7 +94,7 @@ app.get('/keys', (req, res) => {
 app.get('/login', (req, res) => {
     if(req.session && req.session.key) {
         if(req.session.key == actionHander.adminKey) {
-            res.render('admin')
+            res.render('admin', {screen:req.body.screen})
         }
         else if(req.session.key == actionHander.superKey) {
             res.render('supervisor')
@@ -141,7 +141,7 @@ app.post('/login', (req, res) => {
                 console.log(key)
                 console.log(actionHander.adminKey)
                 if(key == actionHander.adminKey) {
-                    res.render('admin')
+                    res.render('admin', {screen:req.body.screen})
                 }
                 else if(key == actionHander.superKey) {
                     res.render('supervisor')
@@ -189,7 +189,7 @@ app.post('/logout', (req, res) => {
 app.get('/runner', (req, res) => {
     if(req.session && req.session.key) {
         if(req.session.key == actionHander.adminKey) {
-            res.render('admin')
+            res.render('admin', {screen:req.body.screen})
         }
         else if(req.session.key == actionHander.superKey) {
             res.render('supervisor')
@@ -218,7 +218,7 @@ app.post('/upLoc', (req, res) => {
     if(req.session && req.session.key && req.session.screen) {
         if(req.session.key == actionHander.adminKey) {
             if(!req.body.location) {
-                res.render('admin', {screen: req.session.screen, error: "no location provided"});
+                res.render('admin', {screen: req.session.screen, error: "location undefined"});
             }
             else {
                 let admin = actionHander.getAdminByScreenName(req.session.screen);
@@ -522,6 +522,7 @@ app.post('/remMat', (req, res) => {
 app.post('/addMat', (req, res) => {
     if(req.session && req.session.key && req.session.screen) {
         if(req.session.key == actionHander.adminKey) {
+            console.log("key & screen")
             if(req.body.material == undefined || req.body.quantity == undefined) {
                 res.render('admin', {screen: req.session.screen, error: "material or quantities no specified"});
             }
@@ -540,6 +541,7 @@ app.post('/addMat', (req, res) => {
         }
         else {
             req.session.destroy((err) => {
+                console.log("err")
                 if(err) {
                     res.render('login', {error: err});
                 }
