@@ -21,8 +21,30 @@
     <button type="button" class="btn btn-primary ml-auto mr-auto" data-toggle="modal" data-target="#exampleModal">
         Create new task
     </button>
+    <div class="modal fade" id="location" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Task Request</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+            <form action="/upLoc" method="POST">
+                    <div class="form-group">
+                        <label for="materialName">Change location</label>
+                        <input type="text" class="form-control" id="materialName" aria-describedby="mathelp" placeholder="DRL" name="location">
+                        <small id="mathelp" class="form-text text-muted">Enter the name of the material you need</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+      </div>
+    </div>
+  </div>
+</div>
     <form action="/logout" method="POST">
-        <input type="submit" class="btn btn-danger ml-auto">
+        <button type="submit" class="btn btn-danger ml-auto">LOGOUT</button>
     </form>
 </nav>
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -43,7 +65,7 @@
                 <br>
                     <div class="form-group">
                         <label for="materialName">Material name</label>
-                        <input type="text" class="form-control" id="materialName" aria-describedby="mathelp" placeholder="123456789" name="materialName">
+                        <input type="text" class="form-control" id="materialName" aria-describedby="mathelp" placeholder="123456789" name="material">
                         <small id="mathelp" class="form-text text-muted">Enter the name of the material you need</small>
                     </div>
                     <div class="form-group">
@@ -98,7 +120,7 @@
 </div>
 
 <script>
-    setTimeout(function() {
+    setInterval(function() {
         $.post("/supervisor", function(data) {
             var freeMaterials = data.freeMat;
             var usedMaterials = data.used;
@@ -125,19 +147,19 @@
                 $("#tbody").html("")
                 for (var i = 0; i < myTasks.length; i++) {
                     if(myTasks[i].assigned !== null) {
-                        var endStr = "<tr><td>" + myTasks[i].assigned.screenName + "</td><td>" + 
-                                (myTasks[i].item?myTasks[i].item:"none</td><td>") + (myTasks[i].quantity?myTasks[i].quantity:"none</td><td>") + 
-                                "<button class=\"btn btn-danger\" onclick=\"deleteT(" + i + ")\">Delete</button>"+
-                                "<button class=\"btn btn-success\" onclick=\"succeedT(" + i + ")\">Complete</button></tr>" 
+                        var endStr = "<tr><td>" + myTasks[i].assigned + "</td><td>" + 
+                                (myTasks[i].task.item?myTasks[i].task.item:"none") + " </td><td> " + (myTasks[i].task.quantity?myTasks[i].task.quantity:"none") + " </td><td> " +
+                                "<td><button class=\"btn btn-danger\" onclick=\"deleteT(" + i + ")\">Delete</button></td><td>"+
+                                "<button class=\"btn btn-success\" onclick=\"succeedT(" + i + ")\">Complete</button></td></tr>" 
                         $("#tbody").html($("#tbody").html() + endStr)
                     }
                     else {
                         var endStr = "<tr><td>No</td><td>" + 
-                                (myTasks[i].item?myTasks[i].item:"none")  + "</td><td>" + (myTasks[i].quantity?myTasks[i].quantity:"none") + "</td></tr>" 
+                                (myTasks[i].task.item?myTasks[i].task.item:"none")  + "</td><td>" + (myTasks[i].task.quantity?myTasks[i].task.quantity:"none") + "</td></tr>" 
                         $("#tbody").html($("#tbody").html() + endStr)
                     }
                 }   
             }
         })
-    }, 10000);
+    }, 1000);
 </script>

@@ -34,11 +34,15 @@
 </script>
 <nav class="navbar navbar-light bg-light">
     <h3 class="">{{screen}}</h3>
+
     <button type="button" class="btn btn-primary ml-auto mr-auto" data-toggle="modal" data-target="#exampleModal">
         Create new task
     </button>
+    <button type="button" class="btn btn-primary ml-auto mr-auto" data-toggle="modal" data-target="#location">
+        change location
+    </button>
     <form action="/logout" method="POST">
-        <input type="submit" class="btn btn-danger ml-auto">
+        <button type="submit" class="btn btn-danger ml-auto">LOGOUT</button>
     </form>
 </nav>
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -65,6 +69,28 @@
                     <div class="form-group">
                         <label for="quantity">Quantity</label>
                         <input type="text" class="form-control" id="quantity" placeholder="10" name="quantity">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="location" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Task Request</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+            <form action="/upLoc" method="POST">
+                    <div class="form-group">
+                        <label for="materialName">Change location</label>
+                        <input type="text" class="form-control" id="materialName" aria-describedby="mathelp" placeholder="DRL" name="location">
+                        <small id="mathelp" class="form-text text-muted">Enter the name of the material you need</small>
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
             </form>
@@ -192,7 +218,7 @@
             var freeMaterials = data.freeMat;
             console.log(freeMaterials)
             var usedMaterials = data.myMat;
-            var myTasks = data.myTasks;
+            var myTasks = data.mytask;
             var allMats = data.used;
             var allTasks = data.tasks;
             if(freeMaterials) {
@@ -215,7 +241,7 @@
                 $("#allMat").html("")
                 var allMatList = ""
                 for (var i = 0; i < allMats.length; i++) {
-                    allMatList += "<tr><th>" + allMats[i].itemName + "</th><th>" + allMats[i].count + "</th><th>" + allMats[i].user.screenName + "</th></tr>"
+                    allMatList += "<tr><th>" + allMats[i].itemName + "</th><th>" + allMats[i].count + "</th><th>" + allMats[i].user + "</th></tr>"
                 }
                 
                 
@@ -226,15 +252,15 @@
                 dataStorageT = myTasks
                 for (var i = 0; i < myTasks.length; i++) {
                     if(myTasks[i].assigned !== null) {
-                        var endStr = "<tr><td>" + myTasks[i].assigned.screenName + "</td><td>" + 
-                                (myTasks[i].item?myTasks[i].item:"none</td><td>") + (myTasks[i].quantity?myTasks[i].quantity:"none</td><td>") + 
-                                "<button class=\"btn btn-danger\" onclick=\"deleteT(" + i + ")\">Delete</button>"+
-                                "<button class=\"btn btn-success\" onclick=\"succeedT(" + i + ")\">Complete</button></tr>" 
+                        var endStr = "<tr><td>" + myTasks[i].assigned + "</td><td>" + 
+                                (myTasks[i].item?myTasks[i].task.item:"none</td><td>") + (myTasks[i].task.quantity?myTasks[i].task.quantity:"none</td><td>") + 
+                                "<td><button class=\"btn btn-danger\" onclick=\"deleteT(" + i + ")\">Delete</button></td><td>"+
+                                "<button class=\"btn btn-success\" onclick=\"succeedT(" + i + ")\">Complete</button></td></tr>" 
                         $("#tbody").html($("#tbody").html() + endStr)
                     }
                     else {
                         var endStr = "<tr><td>No</td><td>" + 
-                                (myTasks[i].item?myTasks[i].item:"none")  + "</td><td>" + (myTasks[i].quantity?myTasks[i].quantity:"none") + "</td></tr>" 
+                                (myTasks[i].task.item?myTasks[i].task.item:"none")  + "</td><td>" + (myTasks[i].task.quantity?myTasks[i].task.quantity:"none") + "</td></tr>" 
                         $("#tbody").html($("#tbody").html() + endStr)
                     }
                 }
@@ -244,15 +270,15 @@
                 dataStorageA = allTasks
                 for (var i = 0; i < allTasks.length; i++) {
                     if(allTasks[i].assigned !== null) {
-                        var endStr = "<tr><td>" + allTasks[i].assigned.screenName + "</td><td>" + allTasks[i].supervisor.screenName + "</td><td>" +
-                                (allTasks[i].item?allTasks[i].item:"none</td><td>") + (allTasks[i].quantity?allTasks[i].quantity:"none</td><td>") + 
-                                "<button class=\"btn btn-danger\" onclick=\"deleteA(" + i + ")\">Delete</button>"+
-                                "<button class=\"btn btn-success\" onclick=\"succeedA(" + i + ")\">Complete</button></tr>" 
+                        var endStr = "<tr><td>" + allTasks[i].assigned + "</td><td>" + allTasks[i].task.supervisor + "</td><td>" +
+                                (allTasks[i].task.item?allTasks[i].task.item:"none") + '</td><td>' + (allTasks[i].task.quantity?allTasks[i].task.quantity:"none") + "</td><td>" + 
+                                "<td><button class=\"btn btn-danger\" onclick=\"deleteA(" + i + ")\">Delete</button></td><td>"+
+                                "<button class=\"btn btn-success\" onclick=\"succeedA(" + i + ")\">Complete</button></td></tr>" 
                         $("#allTasks").html($("#allTasks").html() + endStr)
                     }
                     else {
-                        var endStr = "<tr><td>No</td><td>"  + allTasks[i].supervisor.screenName + "</td><td>" + 
-                                (allTasks[i].item?allTasks[i].item:"none")  + "</td><td>" + (allTasks[i].quantity?allTasks[i].quantity:"none") + "</td></tr>" 
+                        var endStr = "<tr><td>No</td><td>"  + allTasks[i].task.supervisor + "</td><td>" + 
+                                (allTasks[i].task.item?allTasks[i].task.item:"none")  + "</td><td>" + (allTasks[i].task.quantity?allTasks[i].task.quantity:"none") + "</td></tr>" 
                         $("#allTasks").html($("#allTasks").html() + endStr)
                     }
                 }

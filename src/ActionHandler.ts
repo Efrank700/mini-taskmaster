@@ -293,7 +293,7 @@ export class ActionHandler {
             if(targetTask.item instanceof Array) {
                 if(targetTask.quantity instanceof Array) {
                     for(let i = 0; i < targetTask.item.length; i++) {
-                        this.event.addFreeMaterials(targetTask.item[i], targetTask.quantity[i]);
+                        this.event.returnMaterials(targetTask.item[i], targetTask.quantity[i], targetTask.supervisor);
                     }
                 }
             }

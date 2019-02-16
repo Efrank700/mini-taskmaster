@@ -94,13 +94,13 @@ app.get('/keys', (req, res) => {
 app.get('/login', (req, res) => {
     if(req.session && req.session.key) {
         if(req.session.key == actionHander.adminKey) {
-            res.render('admin', {screen:req.body.screen})
+            res.redirect('/admin')
         }
         else if(req.session.key == actionHander.superKey) {
-            res.render('supervisor')
+            res.redirect('/supervisor')
         }
         else if(req.session.key == actionHander.runnerKey) {
-            renderRunner(req, res, req.session.screen, null, null)
+            res.redirect('/runner')
         }
         else {
             req.session.destroy((err) => {
@@ -128,7 +128,7 @@ app.post('/login', (req, res) => {
                 if(addition[1] == participantTypes.runner) {
                     req.session!.key = key;
                     req.session!.screen = screen;
-                    renderRunner(req, res, req.session!.screen, null, null)
+                    res.redirect('/runner')
                 }
                 else {
                     res.render('login', {taken: true})
@@ -141,10 +141,10 @@ app.post('/login', (req, res) => {
                 console.log(key)
                 console.log(actionHander.adminKey)
                 if(key == actionHander.adminKey) {
-                    res.render('admin', {screen:req.body.screen})
+                    res.redirect('admin')
                 }
                 else if(key == actionHander.superKey) {
-                    res.render('supervisor')
+                    res.redirect('supervisor')
                     console.log("rdrs")
                 }
                 else if(key == actionHander.runnerKey) {
@@ -430,7 +430,6 @@ app.get('/supervisor', (req, res) => {
         }
     }
     else {
-        console.log("no")
         res.render('login');
     }
 })
@@ -441,11 +440,18 @@ app.post('/supervisor', (req, res) => {
             let allMat = actionHander.getMaterials();
             if(allMat) {
                 let freeMats = allMat[1];
-                let usedmats = allMat[0].filter((element) => {element.user.screenName == req.session!.screen})
-                let allTasks = actionHander.getCurrentTasks().filter((element) => {
-                    element.task.supervisor.screenName == req.session!.screen
+                let usedmats = allMat[0].map((target) => {
+                    return {itemName: target.itemName, count: target.count, user: target.user.screenName}
                 })
-                res.json({freeMat: freeMats, used: usedmats, tasks: allTasks});
+                let allTasks = actionHander.getCurrentTasks().map((target) => {
+                    let newTask =  {...target.task, supervisor: target.task.supervisor.screenName}
+                    return {assigned: target.assigned==null?null:target.assigned.screenName, task: newTask}
+                });
+                let myTasks = allTasks.filter((element) => {
+                    return element.task.supervisor == req.session!.screen
+                    
+                })
+                res.json({freeMat: freeMats, used: usedmats, tasks: myTasks});
             }
         }
         else {
@@ -463,16 +469,22 @@ app.post('/admin', (req, res) => {
             let allMat = actionHander.getMaterials();
             if(allMat) {
                 let freeMats = allMat[1];
-                let usedmats = allMat[0].filter((element) => {element.user.screenName == req.session!.screen})
+                let usedmats = allMat[0].filter((element) => {return element.user.screenName == req.session!.screen})
                 let usedMatsRep = usedmats.map((target) => {
                     return {itemName: target.itemName, count: target.count, user: target.user.screenName}
                 })
-                let allTasks = actionHander.getCurrentTasks();
-                let myTasks = allTasks.filter((element) => {
-                    element.task.supervisor.screenName == req.session!.screen
+                let usedMatAll = allMat[0].map((target) => {
+                    return {itemName: target.itemName, count: target.count, user: target.user.screenName}
                 })
-                console.log({freeMat: freeMats, used: allMat[0], tasks: allTasks, myMat: usedMatsRep, mytask: myTasks})
-                res.json({freeMat: freeMats, used: allMat[0], tasks: allTasks, myMat: usedMatsRep, mytask: myTasks});
+                let allTasks = actionHander.getCurrentTasks().map((target) => {
+                    let newTask =  {...target.task, supervisor: target.task.supervisor.screenName}
+                    return {assigned: target.assigned==null?null:target.assigned.screenName, task: newTask}
+                });
+                let myTasks = allTasks.filter((element) => {
+                    return element.task.supervisor == req.session!.screen
+                    
+                })
+                res.json({freeMat: freeMats, used: usedMatAll, tasks: allTasks, myMat: usedMatsRep, mytask: myTasks});
             }
         }
         else {

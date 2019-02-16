@@ -1,7 +1,7 @@
 <nav class="navbar navbar-light bg-light">
     <h3 class="">{{screen}}</h3>
     <form action="/logout" method="POST">
-        <input type="submit" class="btn btn-danger ml-auto">
+        <button type="submit" class="btn btn-danger ml-auto">LOGOUT</button>
     </form>
 </nav>
 <div class="offset-md-3 col-md-6 text-center">
@@ -22,7 +22,7 @@
     {{/if}}
 </div>
 <script>
-    setTimeout(function() {
+    setInterval(function() {
     location.reload();
-    }, 5000);
+    }, 3000);
 </script>

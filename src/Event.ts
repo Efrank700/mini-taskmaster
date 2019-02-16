@@ -511,10 +511,12 @@ export class TaskMastrEvent{
         }
         else {
             let removedRunner = this.taskedRunners.splice(runnerIndex, 1);
-            this.freeRunners.push(removedRunner[0]);
+            this.freeRunners.push(removedRunner[0])
             let taskIndex = this.unfinishedTasks.findIndex((element) => {
                 return element.task == runnerTask
             });
+            this.removeRunner(runner);
+            this.addRunner(runner)
             if(taskIndex == -1) return[null, runner];
             else {
                 let remTask = this.unfinishedTasks.splice(taskIndex, 1);
